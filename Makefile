@@ -16,6 +16,7 @@ ELASTICSEARCH_CONTAINER_NAME ?= $(POD_NAME)-elasticsearch
 RUN_INTEGRATION_TESTS ?= 0
 
 API_PORT := 8080
+DEBUG_PORT := 5678
 
 run-command=(podman run --rm -ti --volume $(PWD):/mnt/code:rw \
 	--pod $(POD_NAME) \
@@ -61,6 +62,7 @@ destroy-pod:
 
 create-pod: destroy-pod
 	podman pod create --publish $(API_PORT):$(API_PORT) \
+		--publish $(DEBUG_PORT):$(DEBUG_PORT) \
 		--publish $(ELASTICSEARCH_PORT1):$(ELASTICSEARCH_PORT1) \
 		--publish $(ELASTICSEARCH_PORT2):$(ELASTICSEARCH_PORT2) \
 		--name $(POD_NAME)

@@ -1,8 +1,10 @@
 from datetime import date
 from typing import List, Optional
 
+import debugpy
 from fastapi import FastAPI, Query, Path
 from pydantic import BaseModel
+from uvicorn.config import logger
 
 from gazettes import GazetteAccessInterface, GazetteRequest
 
@@ -11,6 +13,23 @@ app = FastAPI(
     description="API to access the gazettes from all Brazilian cities",
     version="0.9.0",
 )
+
+
+@app.on_event("startup")
+async def start_remote_debug():
+    logger.info('...: START UP :...')
+
+    import os
+    print(f'DIR: {os.getcwd()}')
+    print(f'LIST DIR: {os.listdir()}')
+
+    try:
+        debugpy.listen(('0.0.0.0', 3004))
+        logger.debug(f"Waiting for debugger attach on port {5678}")
+        debugpy.wait_for_client()
+        logger.debug('VSCODE attached with success. Happy debugging!')
+    except Exception as ex:
+        logger.error(f"DEBUG NOT WORKING: {ex}")
 
 
 class GazetteItem(BaseModel):
